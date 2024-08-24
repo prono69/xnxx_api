@@ -249,23 +249,25 @@ class Client:
         return Video(url)
 
     @classmethod
-    def search(cls, query, upload_time: UploadTime = "", length: Length = "", searching_quality: SearchingQuality = ""):
+    def search(cls, query, upload_time: UploadTime = "", length: Length = "", searching_quality: SearchingQuality = "", limit: int = 5):
         """
         :param query:
         :param upload_time:
         :param length:
         :param searching_quality:
+        :param limit:
         :return: (Search) the search object
         """
-        return Search(query, upload_time, length, searching_quality)
+        return Search(query, upload_time, length, searching_quality, limit)
 
     @classmethod
-    def get_user(cls, url):
+    def get_user(cls, url, limit: int = 5):
         """
         :param url: (str) The user URL
+        :param limit: (int) The user limit
         :return: (User) The User object
         """
-        return User(url)
+        return User(url, limit)
 
 
 def main():
