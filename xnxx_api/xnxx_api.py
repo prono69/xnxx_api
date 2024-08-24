@@ -165,11 +165,18 @@ class Video:
 
 
 class Search:
-    def __init__(self, query: str, upload_time: UploadTime, length: Length, searching_quality: SearchingQuality):
+    def __init__(
+        self, query: str,
+        upload_time: UploadTime,
+        length: Length,
+        searching_quality: SearchingQuality,
+        limit: int = 5
+    ):
         self.query = self.validate_query(query)
         self.upload_time = upload_time
         self.length = length
         self.searching_quality = searching_quality
+        self.limit = limit
 
     @classmethod
     def validate_query(cls, query):
@@ -185,8 +192,8 @@ class Search:
         return REGEX_SEARCH_TOTAL_PAGES.search(self.html_content).group(1)
 
     @cached_property
-    def videos(self, limit=5):
-        page = limit
+    def videos(self):
+        page = self.limit
         if page == 0:
             url = f"https://www.xnxx.com/search{self.upload_time}{self.length}{self.searching_quality}/{self.query}"
         else:
@@ -198,8 +205,9 @@ class Search:
 
 
 class User:
-    def __init__(self, url):
+    def __init__(self, url, limit: int = 5):
         self.url = url
+        self.limit = limit
         self.pages = round(self.total_videos / 50)
         self.content = Core().get_content(url).decode("utf-8")
 
@@ -211,8 +219,8 @@ class User:
         return data
 
     @cached_property
-    def videos(self, limit=5):
-        page = limit
+    def videos(self):
+        page = self.limit
         url = f"{self.url}/videos/best/{page}?from=goldtab"
         content = Core().get_content(url, headers=HEADERS).decode("utf-8")
         data = html.unescape(json.loads(content))
