@@ -185,25 +185,16 @@ class Search:
         return REGEX_SEARCH_TOTAL_PAGES.search(self.html_content).group(1)
 
     @cached_property
-    def videos(self):
-        page = 0
-        while True:
-
-            if page == 0:
-                url = f"https://www.xnxx.com/search{self.upload_time}{self.length}{self.searching_quality}/{self.query}"
-
-            else:
-                url = f"https://www.xnxx.com/search{self.upload_time}{self.length}{self.searching_quality}/{self.query}/{page}"
-
-            content = Core().get_content(url, headers=HEADERS).decode("utf-8")
-            urls = REGEX_SCRAPE_VIDEOS.findall(content)
-            for url_ in urls:
-                yield Video(f"https://www.xnxx.com/video-{url_}")
-
-            if int(page) >= int(self.total_pages):
-                break
-
-            page += 1
+    def videos(self, limit=5):
+        page = limit
+        if page == 0:
+            url = f"https://www.xnxx.com/search{self.upload_time}{self.length}{self.searching_quality}/{self.query}"
+        else:
+            url = f"https://www.xnxx.com/search{self.upload_time}{self.length}{self.searching_quality}/{self.query}/{page}"
+        content = Core().get_content(url, headers=HEADERS).decode("utf-8")
+        urls = REGEX_SCRAPE_VIDEOS.findall(content)
+        for url_ in urls:
+            yield Video(f"https://www.xnxx.com/video-{url_}")
 
 
 class User:
@@ -220,20 +211,15 @@ class User:
         return data
 
     @cached_property
-    def videos(self):
-        page = 0
-        while True:
-            page += 1
-            url = f"{self.url}/videos/best/{page}?from=goldtab"
-            content = Core().get_content(url, headers=HEADERS).decode("utf-8")
-            data = html.unescape(json.loads(content))
-            videos = data["videos"]
-            for video in videos:
-                url = video.get("u")
-                yield Video(f"https://www.xnxx.com{url}")
-
-            if int(page) >= int(self.pages):
-                break
+    def videos(self, limit=5):
+        page = limit
+        url = f"{self.url}/videos/best/{page}?from=goldtab"
+        content = Core().get_content(url, headers=HEADERS).decode("utf-8")
+        data = html.unescape(json.loads(content))
+        videos = data["videos"]
+        for video in videos:
+            url = video.get("u")
+            yield Video(f"https://www.xnxx.com{url}")
 
     @cached_property
     def total_videos(self):
