@@ -170,13 +170,15 @@ class Search:
         upload_time: UploadTime,
         length: Length,
         searching_quality: SearchingQuality,
-        limit: int = 5
+        limit: int = 5,
+        mode: Mode
     ):
         self.query = self.validate_query(query)
         self.upload_time = upload_time
         self.length = length
         self.searching_quality = searching_quality
         self.limit = limit
+        self.mode = mode
 
     @classmethod
     def validate_query(cls, query):
@@ -185,7 +187,7 @@ class Search:
     @cached_property
     def html_content(self):
         # Now this is going to be weird, just don't ask
-        return Core().get_content(f"https://www.xnxx.com/search{self.upload_time}{self.length}{self.searching_quality}/{self.query}", headers=HEADERS).decode("utf-8")
+        return Core().get_content(f"https://www.xnxx.com/search{self.mode}{self.upload_time}{self.length}{self.searching_quality}/{self.query}", headers=HEADERS).decode("utf-8")
 
     @cached_property
     def total_pages(self):
@@ -195,9 +197,9 @@ class Search:
     def videos(self):
         page = self.limit
         if page == 0:
-            url = f"https://www.xnxx.com/search{self.upload_time}{self.length}{self.searching_quality}/{self.query}"
+            url = f"https://www.xnxx.com/search{self.mode}{self.upload_time}{self.length}{self.searching_quality}/{self.query}"
         else:
-            url = f"https://www.xnxx.com/search{self.upload_time}{self.length}{self.searching_quality}/{self.query}/{page}"
+            url = f"https://www.xnxx.com/search{self.mode}{self.upload_time}{self.length}{self.searching_quality}/{self.query}/{page}"
         content = Core().get_content(url, headers=HEADERS).decode("utf-8")
         urls = REGEX_SCRAPE_VIDEOS.findall(content)
         for url_ in urls:
@@ -249,16 +251,17 @@ class Client:
         return Video(url)
 
     @classmethod
-    def search(cls, query, upload_time: UploadTime = "", length: Length = "", searching_quality: SearchingQuality = "", limit: int = 5):
+    def search(cls, query, upload_time: UploadTime = "", length: Length = "", searching_quality: SearchingQuality = "", limit: int = 5, mode: Mode = ""):
         """
         :param query:
         :param upload_time:
         :param length:
         :param searching_quality:
         :param limit:
+        :param mode:
         :return: (Search) the search object
         """
-        return Search(query, upload_time, length, searching_quality, limit)
+        return Search(query, upload_time, length, searching_quality, limit, mode)
 
     @classmethod
     def get_user(cls, url, limit: int = 5):
