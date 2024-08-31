@@ -170,15 +170,15 @@ class Search:
         upload_time: UploadTime,
         length: Length,
         searching_quality: SearchingQuality,
+        mode: Mode,
         limit: int = 5,
-        mode: Mode
     ):
         self.query = self.validate_query(query)
         self.upload_time = upload_time
         self.length = length
         self.searching_quality = searching_quality
-        self.limit = limit
         self.mode = mode
+        self.limit = limit
 
     @classmethod
     def validate_query(cls, query):
@@ -251,17 +251,17 @@ class Client:
         return Video(url)
 
     @classmethod
-    def search(cls, query, upload_time: UploadTime = "", length: Length = "", searching_quality: SearchingQuality = "", limit: int = 5, mode: Mode = ""):
+    def search(cls, query, upload_time: UploadTime = "", length: Length = "", searching_quality: SearchingQuality = "", mode: Mode = "", limit: int = 5):
         """
         :param query:
         :param upload_time:
         :param length:
         :param searching_quality:
+        :param mode:	
         :param limit:
-        :param mode:
         :return: (Search) the search object
         """
-        return Search(query, upload_time, length, searching_quality, limit, mode)
+        return Search(query, upload_time, length, searching_quality, mode, limit)
 
     @classmethod
     def get_user(cls, url, limit: int = 5):
